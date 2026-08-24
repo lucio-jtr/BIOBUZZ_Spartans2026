@@ -40,12 +40,12 @@ public class Constants {
             .headingPIDFCoefficients(new PIDFCoefficients(0.63, 0, 0.0025, 0.03)) //fixme: PIDFCoefficients(0.9, 0, 0.03, 0.05)
 //            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2.5, 0, 0.07, 0.01))
 //NOTE: Drive PID
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.07, 0, 0.002, 0, 0.03))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.07, 0, 0.003, 0, 0.03))
 //            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0, 0.05, 0.6, 0.01))
             .drivePIDFSwitch(15)
 
 //NOTE: Centripental PID
-            .centripetalScaling(0.00091);
+            .centripetalScaling(0.00000005); //fixme: 0.00091
 
     //public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -77,7 +77,7 @@ public class Constants {
             0.1,
             0.009,
             50,
-            1.25,
+            1.185,
             10,
             1
     );
