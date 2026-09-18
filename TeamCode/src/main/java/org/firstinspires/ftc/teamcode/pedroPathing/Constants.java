@@ -21,7 +21,7 @@ public class Constants {
             .forwardZeroPowerAcceleration(-43.4139961087974996) //fixme: -47.334483
             .lateralZeroPowerAcceleration(-54.890349472290546) //fixme: -89.748467
 //NOTE: Translational PID
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.075, 0, 0.0009, 0.02)) //fixme: PIDFCoefficients(0.045, 0, 0.003, 0.06)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.02, 0, 0.002, 0.025)) //fixme: PIDFCoefficients(0.045, 0, 0.003, 0.06)
 //            .translationalPIDFSwitch(4)
 //            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4, 0, 0.005, 0.0006));
 //NOTE: Heading PID
