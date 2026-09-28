@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.TeleOp.TeleOp_Tests;
 
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -11,11 +10,13 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.TeleOp.Mecanism_Tests.Mecanism_REV1;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Configurable
 @TeleOp(name = "TeleOp_Auto_Heading_REV3")
 public class TeleOp_REV3 extends OpMode {
+    Mecanism_REV1 mecanism = new Mecanism_REV1();
 
     private Follower follower;
     private TelemetryManager telemetryM;
@@ -59,15 +60,21 @@ public class TeleOp_REV3 extends OpMode {
     public static double TURN_DEADBAND = 0.05;
 
     // Tiempo que esperamos después de soltar
-    // el joystick antes de capturar el nuevo heading.
-    //
-    // 0.15 = 150 milisegundos
+    // el joystick antes de capturar el nuevo heading
     public static double HEADING_CAPTURE_DELAY = 0.20;
+
+
+    // =====================================================
+    // MODO LENTO
+    // =====================================================
+
+    // Porcentaje de potencia cuando se mantiene LT
+    public static double SLOW_MODE = 0.30;
 
 
     @Override
     public void init() {
-
+        mecanism.initAll(hardwareMap);
         // Crear Follower
         follower = Constants.createFollower(hardwareMap);
 
@@ -148,7 +155,6 @@ public class TeleOp_REV3 extends OpMode {
         boolean driverTurning =
                 Math.abs(driverTurn) > TURN_DEADBAND;
 
-
         double headingCorrection = 0;
 
 
@@ -158,17 +164,11 @@ public class TeleOp_REV3 extends OpMode {
 
         if (driverTurning) {
 
-            /*
-             * EL DRIVER TIENE CONTROL TOTAL.
-             *
-             * El Heading Hold queda completamente desactivado.
-             */
-
+            // El driver tiene control absoluto del giro
             headingCorrection = 0;
 
             wasTurning = true;
             capturingHeading = false;
-
 
             // Reiniciar PID
             headingIntegral = 0;
@@ -184,20 +184,12 @@ public class TeleOp_REV3 extends OpMode {
 
         else if (wasTurning && !capturingHeading) {
 
-            /*
-             * El driver acaba de soltar el joystick.
-             *
-             * NO capturamos el heading inmediatamente.
-             *
-             * Primero dejamos que el robot termine de
-             * girar por su propia inercia.
-             */
-
+            // Comenzamos a esperar a que el robot
+            // termine de girar por inercia
             capturingHeading = true;
 
             headingReleaseTime = System.nanoTime();
 
-            // PID todavía apagado
             headingCorrection = 0;
 
             headingIntegral = 0;
@@ -220,48 +212,17 @@ public class TeleOp_REV3 extends OpMode {
                             / 1_000_000_000.0;
 
 
-            /*
-             * Durante este pequeño período:
-             *
-             * - No corregimos
-             * - No intentamos regresar
-             * - Dejamos que el robot termine de girar
-             */
-
+            // Todavía no capturamos el nuevo heading
             headingCorrection = 0;
 
 
-            // =================================================
-            // YA PASÓ EL TIEMPO DE ESTABILIZACIÓN
-            // =================================================
-
             if (elapsedTime >= HEADING_CAPTURE_DELAY) {
 
-                /*
-                 * ESTE ES EL MOMENTO IMPORTANTE.
-                 *
-                 * Volvemos a leer el heading ACTUAL.
-                 *
-                 * Ese será el nuevo objetivo.
-                 *
-                 * Ejemplo:
-                 *
-                 * 90° → driver gira → 180°
-                 *             ↓
-                 *          suelta
-                 *             ↓
-                 * robot termina de estabilizarse
-                 *             ↓
-                 * currentHeading = 181°
-                 *             ↓
-                 * targetHeading = 181°
-                 */
-
-                currentHeading =
-                        follower.getPose().getHeading();
+                // Ahora sí tomamos el heading REAL
+                // después de que terminó la inercia
+                currentHeading = follower.getPose().getHeading();
 
                 targetHeading = currentHeading;
-
 
                 // Reiniciar PID
                 headingIntegral = 0;
@@ -269,8 +230,6 @@ public class TeleOp_REV3 extends OpMode {
 
                 previousTime = System.nanoTime();
 
-
-                // Ya capturamos el nuevo heading
                 capturingHeading = false;
                 wasTurning = false;
             }
@@ -278,15 +237,10 @@ public class TeleOp_REV3 extends OpMode {
 
 
         // =====================================================
-        // 4. HEADING HOLD NORMAL
+        // 4. HEADING HOLD
         // =====================================================
 
-        else {
-
-            /*
-             * Aquí el driver NO está girando
-             * y ya tenemos un target establecido.
-             */
+        if (!driverTurning && !capturingHeading) {
 
             double headingError =
                     normalizeAngle(
@@ -294,7 +248,7 @@ public class TeleOp_REV3 extends OpMode {
                     );
 
 
-            // Tiempo
+            // Tiempo transcurrido
             long currentTime = System.nanoTime();
 
             double deltaTime =
@@ -309,17 +263,17 @@ public class TeleOp_REV3 extends OpMode {
             }
 
 
-            // =================================================
+            // -------------------------------------------------
             // P
-            // =================================================
+            // -------------------------------------------------
 
             double proportional =
                     KP * headingError;
 
 
-            // =================================================
+            // -------------------------------------------------
             // I
-            // =================================================
+            // -------------------------------------------------
 
             headingIntegral +=
                     headingError * deltaTime;
@@ -328,9 +282,9 @@ public class TeleOp_REV3 extends OpMode {
                     KI * headingIntegral;
 
 
-            // =================================================
+            // -------------------------------------------------
             // D
-            // =================================================
+            // -------------------------------------------------
 
             double derivative =
                     (headingError - previousHeadingError)
@@ -344,9 +298,9 @@ public class TeleOp_REV3 extends OpMode {
                     headingError;
 
 
-            // =================================================
-            // PID
-            // =================================================
+            // -------------------------------------------------
+            // PID FINAL
+            // -------------------------------------------------
 
             headingCorrection =
                     proportional
@@ -372,35 +326,49 @@ public class TeleOp_REV3 extends OpMode {
 
         double finalTurn;
 
-
         if (driverTurning) {
 
-            /*
-             * Driver manda directamente.
-             */
+            // El driver está girando manualmente
             finalTurn = driverTurn;
 
         } else if (capturingHeading) {
 
-            /*
-             * Estamos esperando que el robot termine
-             * de asentarse.
-             *
-             * NO corregimos.
-             */
+            // Mientras esperamos estabilización,
+            // no hacemos ninguna corrección
             finalTurn = 0;
 
         } else {
 
-            /*
-             * Heading Hold está activo.
-             */
+            // Heading Hold
             finalTurn = headingCorrection;
         }
 
 
         // =====================================================
-        // DRIVE
+        // MODO LENTO
+        // =====================================================
+
+        /*
+         * Si LT está presionado:
+         *
+         *     forward  → 30%
+         *     lateral  → 30%
+         *     giro     → 30%
+         *
+         * Esto funciona tanto para el giro manual
+         * como para la corrección de heading.
+         */
+
+        if (gamepad1.left_trigger > 0) {
+
+            forward *= SLOW_MODE;
+            lateral *= SLOW_MODE;
+            finalTurn *= SLOW_MODE;
+        }
+
+
+        // =====================================================
+        // MOVER ROBOT
         // =====================================================
 
         follower.setTeleOpDrive(
@@ -412,7 +380,17 @@ public class TeleOp_REV3 extends OpMode {
 
 
         // =====================================================
-        // PANELS
+        // AQUÍ VAN LOS MECANISMOS
+        // =====================================================
+        if (gamepad1.right_trigger > 0.1) {
+            mecanism.intake(-0.8);
+        }
+        else {
+            mecanism.intake(0);
+        }
+
+        // =====================================================
+        // TELEMETRÍA
         // =====================================================
 
         telemetryM.debug(
@@ -450,24 +428,19 @@ public class TeleOp_REV3 extends OpMode {
 
         telemetryM.addData(
                 "Heading Hold",
-                !driverTurning && !capturingHeading
+                !driverTurning
         );
 
         telemetryM.addData(
-                "Capturing Heading",
-                capturingHeading
-        );
-
-        telemetryM.addData(
-                "Capture Delay",
-                HEADING_CAPTURE_DELAY
+                "Slow Mode",
+                gamepad1.left_trigger > 0
         );
 
         telemetryM.update(telemetry);
 
 
         // =====================================================
-        // TELEMETRÍA DRIVER STATION
+        // TELEMETRÍA NORMAL
         // =====================================================
 
         telemetry.addData(
@@ -487,11 +460,6 @@ public class TeleOp_REV3 extends OpMode {
                                 targetHeading - currentHeading
                         )
                 )
-        );
-
-        telemetry.addData(
-                "Heading Hold",
-                !driverTurning && !capturingHeading
         );
 
         telemetry.update();
