@@ -14,13 +14,10 @@ import java.util.List;
 @TeleOp
 public class AprilTag_Camera_REV1 extends OpMode {
     private Servo servo_pos;
-    double incremento = 0.05;
     double position = 0.5;
 
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
-
-
 
     @Override
     public void init() {
@@ -75,7 +72,7 @@ public class AprilTag_Camera_REV1 extends OpMode {
                     }
                 }
             }
-        //servo_pos.setPosition(position);
+        servo_pos.setPosition(position);
 
         telemetry.addData("Position", servo_pos.getPosition());
         telemetry.update();
