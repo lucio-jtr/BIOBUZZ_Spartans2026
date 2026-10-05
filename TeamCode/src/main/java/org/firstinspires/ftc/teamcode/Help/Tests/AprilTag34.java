@@ -26,7 +26,7 @@ public class AprilTag34 extends OpMode {
     public void init() {
         servo_pos = hardwareMap.get(Servo.class, "servo");
 
-        servo_pos.setPosition(0.5);
+        servo_pos.setPosition(position);
 
 
         // Inicializar el procesador de AprilTags
@@ -56,21 +56,26 @@ public class AprilTag34 extends OpMode {
                 telemetry.addData("Center Y", "%.2f", d.ftcPose.y);
                 telemetry.addData("Center Z", "%.2f", d.ftcPose.z);
 
-                if (d.id == 23) {
+                if (d.id == 34) {
 
                     double errorX = d.ftcPose.x;
-                    double ajuste = errorX * 0.000055;
+                    double ajuste = errorX * 0.00004;
 
-                    if (d.ftcPose.x < -0.4) {
-                        position = servo_pos.getPosition() - ajuste;
+                    if (d.ftcPose.x > 4) {
+                        telemetry.addLine("DERECHA");
+                        position = position + 0.0001;
+                        servo_pos.setPosition(position);
 
                     }
-                    if (d.ftcPose.x > 0.4) {
-                        position = servo_pos.getPosition() - ajuste;
+                    if (d.ftcPose.x < -4) {
+                        telemetry.addLine("IZQUIERDA");
+                        position = position - 0.0001;
+                        servo_pos.setPosition(position);
+
                     }
                 }
             }
-        servo_pos.setPosition(position);
+        //servo_pos.setPosition(position);
 
         telemetry.addData("Position", servo_pos.getPosition());
         telemetry.update();
