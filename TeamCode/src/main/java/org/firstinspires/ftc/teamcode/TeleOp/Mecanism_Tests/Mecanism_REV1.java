@@ -20,6 +20,25 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+/**TL: PORTS
+ *>>Control Hub:
+ * motores:
+ *  ("rightFront")  //0
+ *  ("rightRear")    //2
+ *  ("leftRear")  //3
+ *  ("leftFront")    //1
+ * Servos:
+ *
+ * I2C:
+ *  pinpoint = 2
+
+ *>>Expansion Hub;
+ * motores:
+ *  Intake = 0
+ * servos:
+ *
+ */
+
 public class Mecanism_REV1 {
     // Tl:========= INTAKE =========
     public DcMotor intake;

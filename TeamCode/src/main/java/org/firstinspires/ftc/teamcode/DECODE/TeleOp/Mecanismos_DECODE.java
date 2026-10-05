@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.DECODE.TeleOp;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -45,7 +44,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
  *  pateador = 0
  */
 
-public class Mecanismos {
+public class Mecanismos_DECODE {
     // Tl:========= INTAKE =========
     public DcMotor intake;
     public Servo intaker;
@@ -462,7 +461,7 @@ public class Mecanismos {
                         cannonPow(0);
                         isShooting = false;
                         piringolaOFF();
-                        barril.setPosition(Mecanismos.Ain);
+                        barril.setPosition(Mecanismos_DECODE.Ain);
                         actualPos = 'a';
 //                        advanceToPreferredEmpty();
                     }
@@ -540,7 +539,7 @@ public class Mecanismos {
         if (distanceSens.getDistance(DistanceUnit.CM) <= 4){
             telemetry.addLine("**********************");
         }
-        if (barril.getPosition() == Mecanismos.Chueco){
+        if (barril.getPosition() == Mecanismos_DECODE.Chueco){
             telemetry.addLine("CHUECO / CHUECO / CHUECO / CHUECO");
         }
         if (ALAN){telemetry.addLine("ALAN / ALAN / ALAN / ALAN");}

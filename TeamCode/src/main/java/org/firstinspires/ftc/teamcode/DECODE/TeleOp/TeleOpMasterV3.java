@@ -11,7 +11,6 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -41,8 +40,8 @@ import java.util.function.Supplier;
 @Configurable
 @TeleOp(name = "TeleOp_DECODE")
 public class TeleOpMasterV3 extends OpMode {
-    Mecanismos mecanism = new Mecanismos();
-    Mecanismos.DetectedColor detectedColor;
+    Mecanismos_DECODE mecanism = new Mecanismos_DECODE();
+    Mecanismos_DECODE.DetectedColor detectedColor;
     private Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
@@ -57,14 +56,14 @@ public class TeleOpMasterV3 extends OpMode {
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 //       start positions
-        mecanism.pateador.setPosition(Mecanismos.pateador_off);
+        mecanism.pateador.setPosition(Mecanismos_DECODE.pateador_off);
 
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
                 .build();
         mecanism.actualPos = 'a';
-        mecanism.barril.setPosition(Mecanismos.Ain);
+        mecanism.barril.setPosition(Mecanismos_DECODE.Ain);
     }
 
     @Override
@@ -193,16 +192,16 @@ public class TeleOpMasterV3 extends OpMode {
 
         if (gamepad1.leftBumperWasReleased()) {
             if (mecanism.actualPos == 'a') {
-                mecanism.barril.setPosition(Mecanismos.Bin);
+                mecanism.barril.setPosition(Mecanismos_DECODE.Bin);
                 mecanism.actualPos = 'b';
             } else if (mecanism.actualPos == 'b') {
-                mecanism.barril.setPosition(Mecanismos.Cin);
+                mecanism.barril.setPosition(Mecanismos_DECODE.Cin);
                 mecanism.actualPos = 'c';
             } else if (mecanism.actualPos == 'c') {
-                mecanism.barril.setPosition(Mecanismos.Chueco);
+                mecanism.barril.setPosition(Mecanismos_DECODE.Chueco);
                 mecanism.actualPos = 'd';
             }else if (mecanism.actualPos == 'd') {
-                mecanism.barril.setPosition(Mecanismos.Ain);
+                mecanism.barril.setPosition(Mecanismos_DECODE.Ain);
                 mecanism.actualPos = 'a';
             }
             /*}else if (mecanism.barril.getPosition() != Mecanismos.Chueco) {
@@ -219,15 +218,15 @@ public class TeleOpMasterV3 extends OpMode {
             mecanism.shoot();
         } //NOTE: DISPARAR
         if (gamepad2.left_trigger > 0.1f) {
-            Mecanismos.pow1 = Mecanismos.POW_CERCA;
+            Mecanismos_DECODE.pow1 = Mecanismos_DECODE.POW_CERCA;
             mecanism.shootNear();
         }//NOTE: SHOOT NEAR
         if (gamepad2.right_bumper) {
             mecanism.shootPow(0);
             mecanism.cannon.setPower(0);
-            mecanism.pateador.setPosition(Mecanismos.pateador_off);
+            mecanism.pateador.setPosition(Mecanismos_DECODE.pateador_off);
             mecanism.isShooting = false;
-            mecanism.barril.setPosition(Mecanismos.Ain);
+            mecanism.barril.setPosition(Mecanismos_DECODE.Ain);
             mecanism.actualPos = 'a';
         } //NOTE: APAGAR CAÑON
 
@@ -247,10 +246,10 @@ public class TeleOpMasterV3 extends OpMode {
 
         //NOTE: a,b,x TO set powers
         if (gamepad2.a) {
-            Mecanismos.pow1 = Mecanismos.POW_LEJOS;
+            Mecanismos_DECODE.pow1 = Mecanismos_DECODE.POW_LEJOS;
         }
         if (gamepad2.b) {
-            Mecanismos.pow1 = Mecanismos.POW_MEDIO;
+            Mecanismos_DECODE.pow1 = Mecanismos_DECODE.POW_MEDIO;
         }
 
         if (gamepad2.yWasReleased()) {
