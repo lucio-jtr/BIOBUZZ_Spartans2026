@@ -5,7 +5,8 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -31,6 +32,8 @@ public class TeleOp_REV4 extends OpMode {
 
     private Follower follower;
     private TelemetryManager telemetryM;
+    private final PoseFactory poseFactory = PoseFactory.degrees();
+    private final Pose startPose = poseFactory.of(72, 72, 0);
 
 
     //TL:---------------------------HEADING HOLD--------------------------------
@@ -77,10 +80,10 @@ public class TeleOp_REV4 extends OpMode {
         mecanism.initAll(hardwareMap);
 
         // Crear Follower
-        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.create(hardwareMap);
 
         // Posición inicial
-        follower.setStartingPose(new Pose(72, 72));
+        follower.setPose(startPose);
 
         // Telemetría de Panels
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -89,7 +92,7 @@ public class TeleOp_REV4 extends OpMode {
         follower.update();
 
         // El heading inicial será nuestro primer objetivo
-        targetHeading = follower.getPose().getHeading();
+        targetHeading = follower.pose().heading();
 
         previousTime = System.nanoTime();
 
@@ -106,11 +109,11 @@ public class TeleOp_REV4 extends OpMode {
     public void start() {
 
         // Activar control TeleOp de Pedro
-        follower.startTeleopDrive();
+        //follower.startTeleopDrive();
 
         // El heading donde comienza el partido
         // será el primer heading que debemos mantener
-        targetHeading = follower.getPose().getHeading();
+        targetHeading = follower.pose().heading();
 
         // Reiniciar PID
         headingIntegral = 0;
@@ -125,8 +128,6 @@ public class TeleOp_REV4 extends OpMode {
 
     @Override
     public void loop() {
-        follower.update();
-
         //TL: CONTROLES DEL DRIVER:
 
         double forward = -gamepad1.left_stick_y;
@@ -161,7 +162,7 @@ public class TeleOp_REV4 extends OpMode {
 
         //TL: HEADING ACTUAL:
 
-        double currentHeading = follower.getPose().getHeading();
+        double currentHeading = follower.pose().heading();
 
 
         //TL: ¿EL DRIVER ESTÁ GIRANDO?
@@ -257,7 +258,7 @@ public class TeleOp_REV4 extends OpMode {
                  */
 
                 currentHeading =
-                        follower.getPose().getHeading();
+                        follower.pose().heading();
 
                 targetHeading = currentHeading;
 
@@ -404,11 +405,10 @@ public class TeleOp_REV4 extends OpMode {
 
         //TL: DRIVE
 
-        follower.setTeleOpDrive(
+        follower.manual(
                 forward,
                 lateral,
-                finalTurn,
-                true
+                finalTurn
         );
 
         //TL:---------------------------MECANISMOS------------------------------
@@ -513,6 +513,7 @@ public class TeleOp_REV4 extends OpMode {
                 gamepad1.left_bumper
         );
 
+        follower.update();
         telemetry.update();
     }
 

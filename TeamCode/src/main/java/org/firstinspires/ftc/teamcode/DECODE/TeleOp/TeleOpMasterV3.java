@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.DECODE.TeleOp;
 
-import com.bylazar.configurables.annotations.Configurable;
+/*import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
  * POWERS [A,B,X]
  * SELECT PATTERN [DPADS]
  *
- */
+ *
 
 @Configurable
 @TeleOp(name = "TeleOp_DECODE")
@@ -207,7 +207,7 @@ public class TeleOpMasterV3 extends OpMode {
             /*}else if (mecanism.barril.getPosition() != Mecanismos.Chueco) {
                 mecanism.barril.setPosition(Mecanismos.Chueco);
                 mecanism.actualPos = 'a';
-            }*/
+            }
         }
         if (gamepad1.dpadDownWasReleased()) {
             mecanism.ALAN = !mecanism.ALAN;
@@ -268,4 +268,4 @@ public class TeleOpMasterV3 extends OpMode {
         }
         mecanism.telem(telemetry);
     }
-}
+}*/

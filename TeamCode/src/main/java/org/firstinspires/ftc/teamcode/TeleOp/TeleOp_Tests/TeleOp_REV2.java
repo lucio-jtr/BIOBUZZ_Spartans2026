@@ -9,6 +9,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -18,12 +19,13 @@ import java.util.function.Supplier;
 
 
 @Configurable
+@Disabled
 @TeleOp(name = "TeleOp_BIOBUZZ")
 public class TeleOp_REV2 extends OpMode {
     private Follower follower;
-    public static Pose startingPose; //See ExampleAuto to understand how to use this
+    //public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
-    private Supplier<PathChain> pathChain;
+    //private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
 
     @Override

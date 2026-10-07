@@ -73,7 +73,7 @@ public class BLUE_AUTO_DOWN_REV2 extends OpMode {
     public void init() {
         Scheduler.reset();
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.create(hardwareMap);
         //follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
         follower.update();

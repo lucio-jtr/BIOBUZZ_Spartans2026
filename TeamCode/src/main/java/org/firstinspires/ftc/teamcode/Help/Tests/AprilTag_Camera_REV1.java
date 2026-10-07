@@ -76,6 +76,5 @@ public class AprilTag_Camera_REV1 extends OpMode {
 
         telemetry.addData("Position", servo_pos.getPosition());
         telemetry.update();
-
     }
 }

@@ -5,7 +5,8 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -65,10 +66,10 @@ public class TeleOp_REV1 extends OpMode {
     public void init() {
 
         // Crear Follower
-        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.create(hardwareMap);
 
         // Pose inicial
-        follower.setStartingPose(new Pose(72, 72));
+        //follower.setPose(startPose);
 
         // Inicializar Panels
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -77,7 +78,7 @@ public class TeleOp_REV1 extends OpMode {
         follower.update();
 
         // El heading inicial será nuestro primer objetivo
-        targetHeading = follower.getPose().getHeading();
+        //targetHeading = follower.getPose().getHeading();
 
         previousTime = System.nanoTime();
 
@@ -96,10 +97,6 @@ public class TeleOp_REV1 extends OpMode {
 
     @Override
     public void start() {
-
-        // Activar manejo manual de Pedro
-        follower.startTeleopDrive();
-
         // Actualizar tiempo del PID
         previousTime = System.nanoTime();
 
@@ -108,7 +105,7 @@ public class TeleOp_REV1 extends OpMode {
         previousHeadingError = 0;
 
         // El heading actual es nuestro objetivo inicial
-        targetHeading = follower.getPose().getHeading();
+        targetHeading = follower.pose().heading();
 
         wasTurning = false;
     }
@@ -142,8 +139,7 @@ public class TeleOp_REV1 extends OpMode {
         // HEADING ACTUAL
         // =========================
 
-        double currentHeading =
-                follower.getPose().getHeading();
+        double currentHeading = follower.pose().heading();
 
         // =========================
         // HEADING HOLD
@@ -281,11 +277,10 @@ public class TeleOp_REV1 extends OpMode {
         // PEDRO PATHING
         // =========================
 
-        follower.setTeleOpDrive(
+        follower.manual(
                 forward,
                 lateral,
-                finalTurn,
-                true
+                finalTurn
         );
 
         // =========================

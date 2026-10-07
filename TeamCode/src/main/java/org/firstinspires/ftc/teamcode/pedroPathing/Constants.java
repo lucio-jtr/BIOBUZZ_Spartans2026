@@ -1,80 +1,100 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import com.pedropathing.control.PIDFCoefficients;
-import com.pedropathing.control.FilteredPIDFCoefficients;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.ftc.FollowerBuilder;
-import com.pedropathing.ftc.drivetrains.MecanumConstants;
-import com.pedropathing.ftc.localization.constants.PinpointConstants;
-import com.pedropathing.paths.PathConstraints;
+import com.pedropathing.revhub.drivetrains.MecanumConfig;
+import com.pedropathing.revhub.localizers.PinpointConfig;
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import com.pedropathing.algorithm.ForesightConfig;
+
+import com.pedropathing.controllers.Controller;
+
+import com.pedropathing.algorithm.Foresight;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.revhub.drivetrains.Mecanum;
+import com.pedropathing.revhub.localizers.PinpointLocalizer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 public class Constants {
-    public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(3)
-//NOTE: Automatic Tunners
-            .forwardZeroPowerAcceleration(-43.4139961087974996) //fixme: -47.334483
-            .lateralZeroPowerAcceleration(-54.890349472290546) //fixme: -89.748467
-//NOTE: Translational PID
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.02, 0, 0.002, 0.025)) //fixme: PIDFCoefficients(0.045, 0, 0.003, 0.06)
-//            .translationalPIDFSwitch(4)
-//            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4, 0, 0.005, 0.0006));
-//NOTE: Heading PID
-            .headingPIDFCoefficients(new PIDFCoefficients(0.83, 0, 0.004, 0.025)) //fixme: PIDFCoefficients(0.9, 0, 0.03, 0.05)
-//            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2.5, 0, 0.07, 0.01))
-//NOTE: Drive PID
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.05, 0, 0.001, 0, 0.03))
-//            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0, 0.05, 0.6, 0.01))
-            .drivePIDFSwitch(15)
 
-//NOTE: Centripental PID
-            .centripetalScaling(0.00000005); //fixme: 0.00091
+    public static MecanumConfig drivetrainConfig = new MecanumConfig(
+            c -> {
+                c.frontLeftName.set("leftFront");
+                c.backLeftName.set("leftRear");
+                c.frontRightName.set("rightFront");
+                c.backRightName.set("rightRear");
 
-    //public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
 
-    public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(1)
-            .rightFrontMotorName("rightFront")
-            .rightRearMotorName("rightRear")
-            .leftRearMotorName("leftRear")
-            .leftFrontMotorName("leftFront")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(79.1633)
-            .yVelocity(54.95642173947312);
-
-    public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(133.1)
-            .strafePodX(-43.7)
-            .distanceUnit(DistanceUnit.MM)
-            .hardwareMapName("pinpoint")
-            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-    public static PathConstraints pathConstraints = new PathConstraints(
-            0.995,
-            0.1,
-            0.1,
-            0.009,
-            50,
-            1.25,
-            10,
-            1
+                c.manualBrakeMode.set(true);
+            }
     );
 
-    public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(followerConstants, hardwareMap)
-                .mecanumDrivetrain(driveConstants)
-                .pinpointLocalizer(localizerConstants)
-                .pathConstraints(pathConstraints)
-                .build();
+    public static PinpointConfig localizerConfig = new PinpointConfig(
+            c -> {
+                c.name.set("pinpoint");
+
+                c.xPodOffset.set(5.2402);
+                c.yPodOffset.set(-1.7205);
+
+                //forwardPodY = 133.1 mm
+                //strafePodX = -43.7 mm
+                //Pedro 3 usa los offsets en pulgadas, así que:
+                //133.1 mm ÷ 25.4 = 5.2402 in
+                //−43.7 mm ÷ 25.4 = −1.7205 in
+
+                c.xPodDirection.set(
+                        GoBildaPinpointDriver.EncoderDirection.REVERSED
+                );
+
+                c.yPodDirection.set(
+                        GoBildaPinpointDriver.EncoderDirection.FORWARD
+                );
+            }
+    );
+
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                // Velocidades máximas
+                c.maxAchievableForwardVelocity.set(79.1633);
+                c.maxAchievableStrafeVelocity.set(54.95642173947312);
+
+                // Desaceleración natural
+                c.naturalForwardDeceleration.set(43.4139961087975);
+                c.naturalStrafeDeceleration.set(54.89034947229055);
+
+                // Translational PID
+                c.forwardTranslational.set(
+                        Controller.pid(0.02, 0, 0.002)
+                );
+
+                c.strafeTranslational.set(
+                        Controller.pid(0.02, 0, 0.002)
+                );
+
+                // Heading PID
+                c.headingFeedback.set(
+                        Controller.pid(0.83, 0, 0.004)
+                );
+
+                // Restricciones de finalización
+                c.parametricTConstraint.set(0.025);
+                c.velocityConstraint.set(0.1);
+                c.translationalConstraint.set(0.1);
+                c.headingConstraint.set(0.007);
+                c.timeoutConstraint.set(100.0);
+            }
+    );
+
+    public static Follower create(HardwareMap h) {
+        return new Follower(
+                new PinpointLocalizer(h, localizerConfig),
+                new Mecanum(h, drivetrainConfig),
+                new Foresight(foresightConfig)
+        );
     }
 }
